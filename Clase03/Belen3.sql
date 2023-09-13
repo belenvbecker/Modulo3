@@ -1,3 +1,4 @@
+-- Active: 1693875076557@@127.0.0.1@3306@adventureworks
 use adventureworks;
 
 -- 1. Obtener un listado de cuál fue el volumen de ventas (cantidad) por año y método de envío mostrando para cada 
@@ -60,20 +61,35 @@ from
 -- 4.Obtener por ProductID, los valores correspondientes a la mediana de las ventas (LineTotal), sobre las ordenes 
 -- realizadas. Investigar las funciones FLOOR() y CEILING().
 
-SELECT p.ProductID, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.LineTotal) OVER (PARTITION BY p.ProductID) AS Mediana FROM
-  (select p.productid, d.linetotal from salesorderheader h 
-   join salesorderdetail d on (h.salesorderid=d.salesorderid)
-   join product p on (d.productid=p.productid)
-   group by p.productid
-   order by p.productid) c;
-
-
+WITH
+vental_total AS (
 SELECT
-  p.ProductID,
-  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY d.LineTotal) OVER (PARTITION BY p.ProductID) AS Mediana
-FROM
-  salesorderheader h
-  JOIN salesorderdetail d ON h.SalesOrderID = d.SalesOrderID
-  JOIN product p ON d.ProductID = p.ProductID
-ORDER BY
-  p.ProductID;
+	d.ProductID
+	, d.LineTotal
+	, COUNT(*) OVER (PARTITION BY d.ProductID) AS conteo
+, ROW_NUMBER() OVER (PARTITION BY d.ProductID ORDER BY d.LineTotal) AS row_number_
+FROM salesorderheader h
+JOIN salesorderdetail d
+	ON h.SalesOrderID = d.SalesOrderID	
+)
+SELECT 
+ProductID
+, AVG(linetotal) AS mediana_producto
+FROM vental_total
+WHERE (FLOOR(conteo/2) = CEILING(conteo/2) AND (row_number_ = FLOOR(conteo/2) OR row_number_  = FLOOR(conteo/2) + 1))
+	OR
+    (FLOOR(conteo/2) != CEILING(conteo/2) AND row_number_ = CEILING(conteo/2))
+GROUP BY 1;
+Contraer
+
+
+
+
+
+
+
+
+
+
+
+
