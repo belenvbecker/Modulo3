@@ -1,3 +1,4 @@
+-- Active: 1693875076557@@127.0.0.1@3306@henry_04
 -- La Dirección de Ventas ha solicitado las siguientes tablas a Marketing con el fin de que sean integradas:
 
 -- 1) La tabla de puntos de venta propios.
@@ -205,3 +206,23 @@ ignore 1 lines
 drop table Compra
 
 select * from Compra
+
+CREATE Table if not exists Sucursales(
+      IdSucursal INT PRIMARY KEY,
+      Sucursal varchar (100),
+      Direccion varchar (100),
+      Localidad varchar (100),
+      Provincia varchar (100),
+      Latitud Decimal (13,10),
+      Longitud Decimal (13,10))
+
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\Sucursales.csv'
+INTO TABLE Sucursales
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines
+
+Select * from sucursales;
