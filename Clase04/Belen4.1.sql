@@ -19,7 +19,7 @@ CREATE Table if not exists canaldeventa(
       descripcion VARCHAR(50));
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\CanalDeVenta.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\CanalDeVenta.csv'
 INTO TABLE canaldeventa  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -31,14 +31,6 @@ drop table canaldeventa
 
 select * from canaldeventa
 
--- Si hay valores repetidos en una columna
-SELECT descripcion, COUNT(*) as cantidad
-FROM canaldeventa
-GROUP BY descripcion
-HAVING COUNT(*) > 1;
-
--- si hay valores nulos
-select * from  canaldeventa where descripcion and codigo is null
 
 -- 2)
 CREATE Table if not exists empleados(
@@ -52,7 +44,7 @@ CREATE Table if not exists empleados(
 
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Empleados.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\empleados.csv'
 INTO TABLE empleados  
 FIELDS TERMINATED BY ';'
 ENCLOSED BY '\"' 
@@ -65,13 +57,6 @@ drop table empleados
 select * from empleados
 
 
-SELECT id_empleado, COUNT(*) as cantidad
-FROM empleados
-GROUP BY id_empleado
-HAVING COUNT(*) > 1;
-
--- Hay 17 ID repetidos 
-
 -- 3)
 CREATE Table if not exists proveedores(
       IDProveedor int PRIMARY KEY,
@@ -83,7 +68,7 @@ CREATE Table if not exists proveedores(
       departamen varchar (50))
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Proveedores.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\proveedores.csv'
 INTO TABLE proveedores  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -95,8 +80,6 @@ drop table proveedores
 
 select * from proveedores
 
-select * from proveedores where Nombre = '';
--- Dos proveedores sin nombres
 
 -- 4)
 CREATE Table if not exists Clientes(
@@ -107,8 +90,8 @@ CREATE Table if not exists Clientes(
       Telefono varchar (50),
       Edad int,
       Localidad varchar (50),
-      X DECIMAL(13,10),
-      Y DECIMAL(13,10),
+      X varchar (100),
+      Y varchar (100),
       Fecha_Alta date,
       Usuario_Alta varchar (50),
       Fecha_Ultima_Modificacion date,
@@ -117,7 +100,7 @@ CREATE Table if not exists Clientes(
       col10 varchar (50))
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Clientes.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\Clientes.csv'
 INTO TABLE Clientes  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -129,7 +112,6 @@ drop table Clientes
 
 select * from Clientes
 
-select * from clientes where 'col10' is not null
 
 -- 5)
 CREATE Table if not exists Productos(
@@ -139,7 +121,7 @@ CREATE Table if not exists Productos(
       Precio decimal (10,2))
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Productos.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\productos.csv'
 INTO TABLE Productos  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -151,6 +133,7 @@ ignore 1 lines
 drop table Productos
 
 select * from Productos
+
 
 -- 6)
 CREATE Table if not exists Ventas(
@@ -166,7 +149,7 @@ CREATE Table if not exists Ventas(
       Cantidad int)
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Venta.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\venta.csv'
 INTO TABLE Ventas  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -187,7 +170,7 @@ CREATE Table if not exists TiposdeGasto(
       Monto_Aproximado int)
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\TiposDeGasto.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\TiposdeGasto.csv'
 INTO TABLE TiposdeGasto  
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -201,7 +184,6 @@ drop table TiposdeGasto
 select * from TiposdeGasto
 
 
-
 -- 8)
 CREATE Table if not exists Compra(
       IdCompra int PRIMARY KEY,
@@ -212,7 +194,7 @@ CREATE Table if not exists Compra(
       IdProveedor int)
 
 LOAD DATA LOCAL INFILE 
-'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework\\Compra.csv'
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\Compra.csv'
 INTO TABLE Compra 
 FIELDS TERMINATED BY ','
 ENCLOSED BY '\"' 
@@ -225,26 +207,24 @@ drop table Compra
 
 select * from Compra
 
-select* from compra where `IdProveedor` is null
+CREATE Table if not exists Sucursales(
+      IdSucursal INT PRIMARY KEY,
+      Sucursal varchar (100),
+      Direccion varchar (100),
+      Localidad varchar (100),
+      Provincia varchar (100),
+      Latitud varchar (100),
+      Longitud varchar (100))
 
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Clase04\\Homework\\Sucursales.csv'
+INTO TABLE Sucursales
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines
 
-CREATE TABLE IF NOT EXISTS sucursales (
-	ID	      INTEGER,
-	Sucursal	VARCHAR(40),
-	Domicilio	VARCHAR(150),
-	Localidad	VARCHAR(80),
-	Provincia	VARCHAR(50),
-	Latitud	Decimal (13,10),
-	Longitud	Decimal (13,10)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+Select * from sucursales;
 
-
-LOAD DATA INFILE 'C:\\Users\\belen\\OneDrive\\Escritorio\\M3\\m3\\Clase 04\\Homework_Resuelto\\Sucursales_UTF8.csv' 
-INTO TABLE sucursales
-CHARACTER SET utf8mb4
-FIELDS TERMINATED BY ';' ENCLOSED BY '\"' ESCAPED BY '\"' 
-LINES TERMINATED BY '\n' IGNORE 1 LINES;
-
-SELECT * FROM sucursal;
-
-drop table sucursales
+drop table sucursales;
