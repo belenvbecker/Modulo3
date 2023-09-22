@@ -308,7 +308,7 @@ GROUP BY t;
 -- realizar algunos ajustes en el script. También están provistas las tablas en formato csv dentro de la 
 -- carpeta 'tablas_cp').
 
-select* from data_salario;
+select idresidencia from data_salario;
 
 SET GLOBAL local_infile = 'ON';
 
@@ -325,11 +325,38 @@ ignore 1 lines
 TituloEmpleo, Salario, Moneda, SalarioUSD, 
 IdResidencia, PorcentajeRemoto, TamanoCompania);
 
+
+CREATE Table if not exists Pais(
+      codigo VARCHAR (40) ,
+      idPais INT,
+      Nombre VARCHAR (100));
+
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\pais.csv'
+INTO TABLE Pais  
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines
+
+drop table pais;
+select * from pais;
+
+ALTER TABLE data_salario
+RENAME COLUMN IdResidencia TO IdPais;
+
+SELECT * FROM data_salario;
+
 -- 16) ¿ Cuántos países NO tienen información sobre los salarios de sus Data Scientists?
 
-select * from data_salario
-where Salario is null;
+
+SELECT COUNT(DISTINCT p.idPais) AS paises_sin_informacion
+FROM pais p
+LEFT JOIN data_salario s ON p.idPais = s.Idpais
+WHERE TituloEmpleo='Data Scientist' and s.salario IS NULL;
 ;
+
 
 -- 17) ¿Cuál es el promedio de salarios en usd de los Data Scientist de la muestra en 2020?
 SELECT AVG(salarioUsd) AS promedio_salario
@@ -346,3 +373,333 @@ FROM data_salario;
 
 -- Respuesta 759.27
 
+SELECT COUNT(IdPais)
+FROM pais
+LEFT JOIN
+    (
+    SELECT idpais
+    FROM data_salario
+    WHERE TituloEmpleo Like 'Data Scientist') t
+On t.idpais = IdPais
+WHERE Idpais is null;
+
+drop table centro;
+CREATE Table centro (CodigoEmpleado int,
+                        IdSucursal INT,
+                        Apellido_y_Nombre VARCHAR(100),
+                        Sucursal VARCHAR(100),
+                        Anio int,
+                        Mes int,
+                        Porcentaje int)
+
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Comisiones Córdoba Centro.csv'
+INTO TABLE centro   
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines;
+
+drop table cerro;
+CREATE Table cerro (CodigoEmpleado int,
+                        IdSucursal INT,
+                        Apellido_y_Nombre VARCHAR(100),
+                        Sucursal VARCHAR(100),
+                        Anio INT,
+                        Mes int,
+                        Porcentaje int)
+
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Comisiones Córdoba Cerro de las Rosas.csv'
+INTO TABLE cerro   
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines;
+
+
+DROP TABLE quiroz;
+CREATE Table quiroz (CodigoEmpleado int,
+                        IdSucursal INT,
+                        Apellido_y_Nombre VARCHAR(100),
+                        Sucursal VARCHAR(100),
+                        Anio INT,
+                        Mes int,
+                        Porcentaje int);
+
+LOAD DATA LOCAL INFILE 
+'C:\\Users\\belen\\OneDrive\\Escritorio\\Modulo3\\Comisiones Córdoba Quiróz.csv'
+INTO TABLE quiroz
+FIELDS TERMINATED BY ';'
+ENCLOSED BY '\"' 
+ESCAPED BY '\"' 
+LINES TERMINATED BY '\n'
+ignore 1 lines;
+
+select * from centro;
+
+SELECT sucursal, SUM(venta - gasto - comisiones) AS ganancia_neta
+FROM sucursales
+WHERE anio = 2020 AND provincia = 'Córdoba'
+GROUP BY sucursal
+ORDER BY ganancia_neta DESC
+LIMIT 1;
+Esta consulta realiza lo siguiente:
+
+SELECT idsucursal, SUM(venta - gasto - sum(v.Precio v.Cantidad t.Porcentaje/100) AS ganancia_neta
+FROM venta
+join quiroz q on q
+WHERE anio = 2020 AND provincia = 'Córdoba'
+GROUP BY sucursal
+ORDER BY ganancia_neta DESC
+LIMIT 1;
+
+
+
+
+ALTER TABLE quiroz 
+ADD idEmpleado INT AFTER CodigoEmpleado ;
+
+UPDATE quiroz SET `idEmpleado` = IdSucursal*1000000 + CodigoEmpleado;
+
+
+ALTER TABLE centro 
+ADD idEmpleado INT AFTER CodigoEmpleado ;
+
+UPDATE centro SET `idEmpleado` = IdSucursal*1000000 + CodigoEmpleado;
+
+ALTER TABLE cerro 
+ADD idEmpleado INT AFTER CodigoEmpleado ;
+
+UPDATE cerro SET `idEmpleado` = IdSucursal*1000000 + CodigoEmpleado;
+
+
+
+
+SELECT v.IdSucursal,
+       (SUM(v.precio * v.cantidad) - SUM(g.monto)) AS ganancia,
+       (SUM(v.precio * v.cantidad) - SUM(g.monto)) - (v.precio * v.cantidad)*(1-q.porcentaje/100) AS ganancia_neta
+FROM venta v
+INNER JOIN gasto g ON v.idsucursal = g.idsucursal AND year(g.fecha) = 2020
+INNER JOIN (SELECT * FROM quiroz
+             UNION
+            SELECT * FROM centro
+            UNION
+            SELECT * FROM cerro) as q
+            ON v.IdEmpleado = q.idEmpleado AND MONTH(v.fecha) = q.Mes
+WHERE YEAR(v.fecha) = 2020 AND v.IdSucursal IN (25, 26, 27) AND q.anio = 2020
+GROUP BY 1
+ORDER BY ganancia_neta DESC
+LIMIT 1;
+
+
+SELECT
+    v.IdSucursal,
+    SUM(v.precio * v.cantidad) - SUM(g.monto) AS ganancia,
+    SUM(v.Precio*v.Cantidad*c.Porcentaje/100) as comision,
+    SUM(v.precio * v.cantidad) - SUM(g.monto) - sum(v.Precio*v.Cantidad*c.Porcentaje/100) descuentocomision 
+FROM venta as v
+JOIN gasto g ON v.idsucursal = g.idsucursal AND year(g.fecha) = 2020 AND MONTH(g.fecha) = 12
+JOIN sucursal s ON (s.IdSucursal = v.idsucursal)
+JOIN (SELECT * FROM quiroz
+        UNION
+        SELECT * FROM centro
+        UNION
+        SELECT * FROM cerro) as c
+  ON v.IdEmpleado = c.idEmpleado
+  AND MONTH(v.fecha) = c.Mes
+WHERE YEAR(v.fecha) = 2020 AND v.IdSucursal IN (25, 26, 27) AND c.anio = 2020
+GROUP BY v.IdSucursal
+ORDER BY 1;
+
+select*from gasto;
+select * from venta;
+
+select * from cerro;
+
+
+select
+	cmes.IdSucursal as Sucursal,
+    round(sum(VentaMensual- VentaMensual*Porcentaje/100)-Gasto,2) as Final	
+from
+    (select
+	IdSucursal,
+	IdEmpleado,
+	month(Fecha) as Mes,
+	sum(Precio*Cantidad) as VentaMensual
+	from venta
+	where year(Fecha)=2020 and IdSucursal in (select
+											    IdSucursal
+												from sucursal as suc
+												where suc.IdLocalidad in (select
+																			loc.IdLocalidad as ciudad
+																			from localidad loc
+																			join provincia as prov on prov.IdProvincia = loc.IdProvincia
+																			where prov.Provincia='Córdoba'))
+group by IdSucursal, month(Fecha), IdEmpleado) as vmes
+join (select
+	IdSucursal,
+	IdEmpleado,
+	Mes,
+	Porcentaje
+	from comision
+	where Anio=2020
+	order by 2,1,3) as cmes on vmes.IdSucursal = cmes.IdSucursal
+								and vmes.IdEmpleado = cmes.IdEmpleado
+                                and vmes.Mes = cmes.Mes
+join (select
+	IdSucursal,
+	sum(Monto) as Gasto
+	from gasto
+	where year(Fecha)=2020 and IdSucursal in (select
+												IdSucursal
+												from sucursal as suc
+												where suc.IdLocalidad in (select
+																			loc.IdLocalidad as ciudad
+																			from localidad loc
+																			join provincia as prov on prov.IdProvincia = loc.IdProvincia
+																			where prov.Provincia='Córdoba'))
+group by IdSucursal) as gasm on gasm.IdSucursal = cmes.IdSucursal
+group by Sucursal;
+
+
+
+WITH ventas AS (
+    SELECT
+        SUM(v.Precio * v.Cantidad)
+        as ventas_neto,
+        v.IdSucursal as id
+    FROM venta as v
+    WHERE
+        YEAR(v.fecha) = 2020 and month(v.fecha)=12
+    GROUP BY
+        2),
+gastos as (
+    SELECT
+        SUM(g.Monto) as gastos,
+        g.IdSucursal as id
+    FROM gasto g
+    WHERE
+        YEAR(g.Fecha) = 2020 and month(v.fecha)=12
+    GROUP BY 2),
+    descuentocomision as (
+        select SUM(v.precio * v.cantidad) - SUM(g.monto) - sum(v.Precio*v.Cantidad*c.Porcentaje/100)
+        v.idsucursal from venta v
+        JOIN (SELECT * FROM quiroz
+        UNION
+        SELECT * FROM centro
+        UNION
+        SELECT * FROM cerro) as c
+  ON v.IdEmpleado = c.idEmpleado
+  AND MONTH(v.fecha) = c.Mes
+WHERE YEAR(v.fecha) = 2020 AND v.IdSucursal IN (25, 26, 27) AND c.anio = 2020)
+select ventas - gastos- descuentocomision, ventas.idsucursal
+GROUP BY ventas.IdSucursal
+ORDER BY 1;
+
+
+ WITH 
+    todo as
+        (SELECT * FROM quiroz
+        UNION
+        SELECT * FROM centro
+        UNION
+        SELECT * FROM cerro)
+SELECT v.`idSucursal` , 
+SUM(v.precio * v.cantidad) - SUM(g.monto) AS ganancia, 
+sum(v.Precio*v.Cantidad*t.Porcentaje/100) as comision,
+SUM(v.precio * v.cantidad) - SUM(g.monto) - sum(v.Precio*v.Cantidad*t.Porcentaje/100) as dtocomision
+FROM todo t
+LEFT JOIN venta v ON (v.`idEmpleado`=t.`idEmpleado`)
+JOIN gasto g ON v.`IdGasto` = g.`IdGasto` 
+WHERE t.Anio = 2020 AND YEAR(v.`Fecha`) = 2020 and t.mes = 12 AND month(v.`Fecha`) = 12
+GROUP BY v.`idSucursal`
+ORDER BY ganancia DESC;
+
+SELECT s.idsucursal, s.sucursal, 
+       SUM(v.precio * v.cantidad) - g.monto) AS ganancia, 
+       sum(v.Precio*v.Cantidad*c.Porcentaje/100) as comision,
+       SUM(v.precio * v.cantidad) - sum(g.monto) - SUM(v.precio * v.cantidad * c.porcentaje / 100) AS ganancia_neta
+FROM sucursal s
+INNER JOIN venta v ON s.idsucursal = v.idsucursal AND YEAR(v.fecha) = 2020
+INNER JOIN gasto g ON s.idsucursal = g.idsucursal AND YEAR(g.fecha) = 2020
+INNER JOIN (SELECT * FROM quiroz
+        UNION
+        SELECT * FROM centro
+        UNION
+        SELECT * FROM cerro) as c
+  ON v.IdEmpleado = c.idEmpleado
+  GROUP BY s.idsucursal, s.sucursal
+ORDER BY ganancia_neta DESC
+LIMIT 1;
+
+ -- 16) ¿Cuál es la sucursal que más comisión pagó en el año 2020?
+with otro as
+(WITH 
+    todo as
+        (SELECT * FROM quiroz
+        UNION
+        SELECT * FROM centro
+        UNION
+        SELECT * FROM cerro)
+SELECT v.`idSucursal` as id, sum(v.Precio*v.Cantidad*t.Porcentaje/100) as comision 
+FROM todo t
+LEFT JOIN venta v ON (v.`idEmpleado`=t.`idEmpleado` and t.mes=month(v.fecha))
+WHERE t.Anio = 2020 AND
+YEAR(v.`Fecha`) = 2020
+GROUP BY v.idempleado, v.`idSucursal`
+ORDER BY comision asc)
+select id, sum(comision) from otro
+group by 1;
+
+
+
+WITH  ganancia2020 AS
+        (SELECT mv,
+        v.sv-sc-sg as ganancia2020
+        from ((SELECT MONTH(`Fecha`) as mv,
+        sum(`Precio`*`Cantidad`) as sv
+        from venta
+        where YEAR(fecha)=2020
+        GROUP BY 1
+        ORDER BY 1)) as v
+        join ((SELECT MONTH(`Fecha`) as mc,
+        sum(`Precio`*`Cantidad`) as sc
+        from compra
+        where YEAR(fecha)=2020
+        GROUP BY 1
+        ORDER BY 1)) as c on v.mv = c.mc
+        join ((SELECT MONTH(`Fecha`) as mg, sum(monto) as sg
+        from gasto
+        where YEAR(fecha)=2020
+        GROUP BY 1
+        ORDER BY 1)) as g on v.mv = g.mg
+        order by 2 asc ),
+    ganancia2019 AS
+        (SELECT mv,
+        v.sv-sc-sg as ganancia2019
+        from ((SELECT MONTH(`Fecha`) as mv,
+        sum(`Precio`*`Cantidad`) as sv
+        from venta
+        where YEAR(fecha)=2019
+        GROUP BY 1
+        ORDER BY 1)) as v
+        join ((SELECT MONTH(`Fecha`) as mc,
+        sum(`Precio`*`Cantidad`) as sc
+        from compra
+        where YEAR(fecha)=2019
+        GROUP BY 1
+        ORDER BY 1)) as c on v.mv = c.mc
+        join ((SELECT MONTH(`Fecha`) as mg, sum(monto) as sg
+        from gasto
+        where YEAR(fecha)=2019
+        GROUP BY 1
+        ORDER BY 1)) as g on v.mv = g.mg
+        order by 2 asc)
+        SELECT  g20.mv, 
+                ganancia2020-ganancia2019 as diferencia
+        FROM ganancia2020 as g20
+        join ganancia2019 as g19 on g20.mv = g19.mv
+        ORDER BY 2 ASC;
