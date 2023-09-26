@@ -1,0 +1,117 @@
+# Checkpoint - Módulo 3
+
+Cómo responder: <br>
+* Cuando se pida una respuesta numérica, redondear al segundo decimal. <br>
+   Ejemplo: 1.3421 -> 1.34;<br>
+            1.8888 -> 1.89;<br>
+            3 -> 3.00.<br>
+
+* Recuerda resolver los problemas de manera secuencial y pensar las consultas por partes. Además te resultará útil pensar di debes reutilizar la lógica de consulta de otro ejercicio.<br>
+
+## Responder Verdadero ó Falso
+
+### 1) Un índice SQL mejora la eficiencia y rapidéz en la búsqueda de información.<br>   VERDADERO
+
+### 2) En la detección de Outliers, el método del Rango Intercuartil se basa en la utilización de la mediana.<br>  VERDADERO
+
+### 3) Las tablas Maestros registran las operaciones ocurridas, todo tipo de transacciones donde intervienen las diferentes entidades del modelo.<br>  FALSO : En SQL, el término "tablas Maestras" generalmente se refiere a las tablas que almacenan información principal o maestra en un modelo de datos. Estas tablas suelen contener información estática y fundamental sobre entidades clave en el sistema, como clientes, productos, proveedores, etc. Sin embargo, las tablas maestras no registran directamente las transacciones u operaciones ocurridas.
+
+## Elegir la opción correcta en base a la observación del siguiente DER:
+
+<img src="DER.jpg"  height="400">
+
+### 4) ¿Cuál de las siguientes es una tabla de hecho?
+1. canal_venta<br>
+2. calendario<br>
+3. tipo_producto<br>
+4. venta<br> ESTA
+
+### 5) El DER mostrado en la imagen:
+1. Es un Modelo Estrella, porque tiene una única tabla de hechos.<br>  
+2. Es un Modelo Copo de Nieve, porque de la tabla venta se desprenden el resto de tablas.<br> ESTE
+3. Niguna de las anteriores.<br> ESTA
+
+## Resuelve los siguientes ejercicios:
+
+### En tu motor de base de datos MySQL, ejecutá las instrucciones del script 'Checkpoint_Create_Insert.sql' (Si no trabajas con MySQL es posible que tengas que realizar algunos ajustes en el script. También están provistas las tablas en formato csv dentro de la carpeta 'tablas_cp').
+
+### 6) La ganancia neta por sucursal es las ventas menos los gastos (Ganancia = Venta - Gasto) ¿Cuál es la sucursal con mayor ganancia neta en 2019? 
+1. Alberdi<br>
+2. Flores<br>  ESTA
+3. Corrientes<br>
+
+### 7) La ganancia neta por producto es las ventas menos las compras (Ganancia = Venta - Compra) ¿Cuál es el tipo de producto con mayor ganancia neta en 2019?
+1. Informática<br>  ESTA
+2. Impresión<br>
+3. Grabacion<br>
+
+### 8) Del total de clientes que realizaron compras en 2019 ¿Qué porcentaje lo hizo en al menos dos sucursales? (expresado en porcentaje y con dos decimales, por ejemplo 11.11)
+
+35,96 %
+
+### 9) Del total de clientes que realizaron compras en 2020 ¿Qué porcentaje no había realizado compras en 2019? (expresado en porcentaje y con dos decimales, por ejemplo 11.11)
+
+40,79 %
+
+### 10) Del total de clientes que realizaron compras en 2019 ¿Qué porcentaje lo hizo también en 2020? (expresado en porcentaje y con dos decimales, por ejemplo 11.11)
+
+85,42
+
+### 11) ¿Qué cantidad de clientes realizó compras sólo por el canal Presencial entre 2019 y 2020?
+
+33
+
+### 12) ¿Cuál es la sucursal que más Venta (Precio * Cantidad) hizo en 2019 a clientes que viven fuera de su provincia?
+1. Flores<br>
+2. Rosario1<br>  ESTA
+3. Córdoba Centro<br>
+
+### 13) ¿Cuál fué el mes del año 2020, de mayor decrecimiento (o menor crecimiento) con respecto al mismo mes del año 2019 si se toman en cuenta a nivel general Ventas (Precio * Cantidad) - Compras (Precio * Cantidad) - Gastos? 
+#### Responder el Número del Mes:
+
+
+
+### 14) El negocio suele requerir con gran frecuencia consultas a nivel trimestral tanto sobre las ventas, como las compras y los gastos, entonces:
+1. Con los índices creados existentes, sólo sobre las claves primarias y foráneas, sería suficiente para cubrir cualquier necesidad de consulta.<br>
+
+
+2. Sería aduecuado colocar un índice sobre el campo trimestre de la tabla calendario aunque este no sea una clave foránea.<br>  -- ESTA:Si tu negocio requiere consultas frecuentes basadas en el trimestre, podría ser adecuado colocar un índice en el campo trimestre de la tabla calendario. Esto facilitaría la búsqueda y el filtrado de datos por trimestre, lo que mejoraría el rendimiento de las consultas.  
+
+3. No se puede crear índices sobre campos que no son clave.<br>
+
+
+### Cada una de las sucursales de la provincia de Córdoba, disponibilizaron un excel donde registraron el porcentaje de comisión que se le otorgó a cada uno de los empleados sobre la venta que realizaron. Es necesario incluir esas tablas (Comisiones Córdoba Centro.xlsx, Comisiones Córdoba Quiróz.xlsx y Comisiones Córdoba Cerro de las Rosas.xlsx) en el modelo y contestar las siguientes preguntas:
+
+### 15) ¿Cuál es el código de empleado del empleado que mayor comisión obtuvo en diciembre del año 2020?
+
+
+
+### 16) ¿Cuál es la sucursal que más comisión pagó en el año 2020?
+1. Córdoba Centro.<br>
+2. Córdoba Quiroz.<br>
+3. Cerro De Las Rosas.<br>
+}
+
+
+Checkpoint 1: Verdadero    --    Sí, es cierto que un índice SQL puede mejorar la eficiencia y rapidez en la búsqueda de información en una base de datos.
+
+Un índice en una base de datos es una estructura de datos que se utiliza para mejorar el rendimiento de las consultas de búsqueda. Básicamente, un índice SQL es una tabla que contiene información sobre los valores de una o varias columnas de una tabla determinada en una base de datos. Esta información se organiza de tal manera que se puede acceder de forma rápida y eficiente a los datos de la tabla cuando se realiza una consulta que utiliza los valores de las columnas indexadas.
+
+Cuando se utiliza un índice SQL en una consulta, el motor de la base de datos utiliza la información del índice para buscar los…
+
+
+Checkpoint 2:  Verdadero --- Sí, el método del rango intercuartil (también conocido como método IQR, por sus siglas en inglés) utiliza la mediana como parte de su cálculo. El rango intercuartil se define como la diferencia entre el percentil 75 (Q3) y el percentil 25 (Q1) de un conjunto de datos ordenados. En otras palabras, el IQR es el rango de los valores centrales del conjunto de datos, que excluyen el 25% de los valores más bajos y el 25% de los valores más altos.
+Una vez que se ha calculado el rango intercuartil, se utiliza para identificar posibles valores atípicos (outliers). Un valor se considera un outlier si está por debajo de Q1 - 1.5 * IQR o por encima de Q3 + 1.5 * IQR. Estos límites se conocen como límites de Tukey y son una forma común de identificar valores atípicos en un conjunto de datos.
+
+
+Checkpoint 3: No se
+
+
+Checkoint 4:  -- Las tablas de hechos son tablas cuyos registros son "hechos" inmutables, como registros de servicio e información de medida. Los registros se anexan progresivamente a la tabla de forma de streaming o en fragmentos grandes. Los registros permanecen allí hasta que se quitan debido al costo o porque han perdido su valor.
+Checkpoint 4: VENTA Porque  de ahí se desprenden las otras otras tablas
+
+
+Checkpoint 5:
+2. Es un Modelo Copo de Nieve, porque de la tabla venta se desprenden el resto de tablas.<br> ESTE
+3. Niguna de las anteriores.<br> ESTA
+tenemos dudas entre estos dos, es un modelo copo de nieve pero dudamos porque dentro de la venta se desprende el producto y de este, se desprende el tipo de producto.
